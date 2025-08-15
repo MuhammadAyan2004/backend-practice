@@ -2,9 +2,9 @@ const fs = require('fs');
 const { buffer } = require('stream/consumers');
 
 const requesthandler = (req, res) => {
-  console.log(req.url, req.method);
+    console.log(req.url, req.method);
 
-  if (req.url === '/') {
+    if (req.url === '/') {
         res.setHeader('content-type', 'text/html')
         res.write('<html>')
         res.write('<head><title>AYAN Ka Server</title></head>')
@@ -23,13 +23,13 @@ const requesthandler = (req, res) => {
             `)
         res.write('</html>')
         return res.end()
-    }else if(req.url.toLowerCase() === '/submit-details' && req.method == 'POST'){
+    } else if (req.url.toLowerCase() === '/submit-details' && req.method == 'POST') {
         const body = []
-        req.on('data',(chunk)=>{
+        req.on('data', (chunk) => {
             console.log(chunk);
             body.push(chunk)
         })
-        req.on('end',()=>{
+        req.on('end', () => {
             const fullbody = Buffer.concat(body).toString()
             console.log(fullbody);
             const parms = new URLSearchParams(fullbody)
@@ -39,11 +39,14 @@ const requesthandler = (req, res) => {
             // }
             const bodyobj = Object.fromEntries(parms)
             console.log(bodyobj);
-            fs.writeFileSync("user.txt",JSON.stringify(bodyobj))
+            fs.writeFile("user.txt", JSON.stringify(bodyobj), (err) => {
+                console.log('Data written successfully', err);
+                res.statusCode = 302;
+                res.setHeader('location', '/')
+                return res.end()
+            });
         })
-        res.statusCode = 302;
-        res.setHeader('location', '/')
-    }
+    } else {
         res.setHeader('content-type', 'text/html')
         res.write('<html>')
         res.write('<head><title>AYAN Ka Server</title></head>')
@@ -51,6 +54,7 @@ const requesthandler = (req, res) => {
         res.write('</html>')
         res.end()
     }
+}
 
 
 module.exports = requesthandler;

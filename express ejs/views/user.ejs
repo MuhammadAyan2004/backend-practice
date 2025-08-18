@@ -1,0 +1,23 @@
+<%- include('partials/head') %>
+
+</head>
+<body class="bg-black ">
+    <header class="bg-blue-500 shadow-md p-4 flex justify-between items-center">
+  <a href="/add-home" 
+     class="text-white bg-black hover:bg-blue-900 px-4 py-2 rounded-lg font-medium transition">
+    Add Home
+  </a>
+</header>
+
+<main class="max-w-4xl mx-auto p-6">
+  <h1 class="text-3xl font-bold text-gray-800 mb-6 text-white">Welcome to Airbnb</h1>
+  <ul class="space-y-4">
+    <% registeredUser.forEach(home => { %>
+      <li class="bg-white shadow-md rounded-xl p-4 border hover:shadow-lg transition">
+        <%= home.userhome %>
+      </li>
+    <% }) %>
+  </ul>
+</main>
+</body>
+</html>

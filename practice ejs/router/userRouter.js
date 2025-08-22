@@ -1,18 +1,19 @@
 const express = require('express');
-const { booking } = require('./hostRouter');
 const userRouter = express.Router()
 
-userRouter.get('/',(req,res)=>{
-    res.render('home',{booking,pageTitle:'Hotel pk',activePage:'home'})
-})
+const homeController = require('../controllers/homes')
 
-userRouter.get('/home.ejs',(req,res)=>{
-    res.render('home',{booking,pageTitle:'Hotel pk',activePage:'home'})
-})
+userRouter.get('/',homeController.getIndex)
 
-userRouter.get('/homeAdded.ejs',(req,res)=>{
-    console.log(booking);
-    res.render('homeAdded',{booking,pageTitle:'homes render',activePage:'homeAdded'})
-})
+userRouter.get('/home.ejs',homeController.gethomeAdd)
+
+userRouter.get('/homeAdded.ejs', homeController.getHomeAdded)
+
+userRouter.get('/homeList.ejs', homeController.getHomeList)
+
+userRouter.get('/favorite.ejs', homeController.getFavoriteList)
+
+userRouter.get('/bookings.ejs', homeController.getBooking)
+
 
 exports.userRouter = userRouter;

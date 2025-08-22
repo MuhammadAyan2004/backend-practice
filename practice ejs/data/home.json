@@ -1,0 +1,23 @@
+[
+  {
+    "houseName": "ayan",
+    "price": "2000",
+    "location": "gohar town residency",
+    "rating": "5 star",
+    "photoUrl": "https://i2.au.reastatic.net/800x600/b47d323c8b248ed41ef6116ddf93f97315c08e280bdf368638267dd51527a2a1/image.jpg"
+  },
+  {
+    "houseName": "Azhar",
+    "price": "1000",
+    "location": "Saima Residency",
+    "rating": "3 star",
+    "photoUrl": "https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg?cs=srgb&dl=pexels-binyaminmellish-106399.jpg&fm=jpg"
+  },
+  {
+    "houseName": "Esar Ahmed",
+    "price": "1500",
+    "location": "Defance phase 7",
+    "rating": "5 star",
+    "photoUrl": "https://i.pinimg.com/736x/31/15/8b/31158bdcca96c408c9883b5edb841128.jpg"
+  }
+]

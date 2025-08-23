@@ -26,7 +26,7 @@ exports.getFavoriteList = (req,res)=>{
     })
 }
 exports.getBooking = (req,res)=>{
-        res.render('store/bookings',{
+    res.render('store/bookings',{
             pageTitle:'Bookings',
             activePage:'booking'
         })
@@ -49,4 +49,16 @@ exports.postHome = (req,res)=>{
     const registerHome = new home(userName,price,location,rating,pic)
     registerHome.save()
     res.render('host/homeRegister', {pageTitle:'Registration Successful',activePage:'AddHome'})
+}
+
+exports.getHomeDetail = (req,res)=>{
+    const homeId = req.params.homeId;
+    home.findById(homeId,home=>{
+        if(!home){
+            res.redirect('/homelist')
+        }else{
+            console.log('your home details:',home);
+            res.render('store/homeDetails', { pageTitle: 'Home Detail', activePage: 'homeList',home })
+        }
+    })
 }

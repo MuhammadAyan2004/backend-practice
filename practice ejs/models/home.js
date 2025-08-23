@@ -11,6 +11,7 @@ module.exports = class home {
         this.photoUrl = photoUrl;
     }
     save () {
+        this.id = Math.random().toString()
         home.fetchAll((booking)=>{
             booking.push(this)
             const filePath = path.join(dirname, 'data', 'home.json') 
@@ -25,4 +26,10 @@ module.exports = class home {
             cb(!err ? JSON.parse(data) : [])
         })
     }   
+    static findById (houseID, cb){
+        home.fetchAll(home=>{
+            const homeFound = home.find(hom => hom.id === houseID)
+            cb(homeFound)
+        })
+    }
 }

@@ -4,7 +4,7 @@ const hostRouter = express.Router()
 const homeController = require('../controllers/homes')
 
 
-hostRouter.get('/Addhome.ejs',homeController.getAddHome); 
-hostRouter.post('/homeRegister.ejs',homeController.postHome);
+hostRouter.get('/Addhome',homeController.getAddHome); 
+hostRouter.post('/homeRegister',homeController.postHome);
 
 exports.hostRouter = hostRouter;

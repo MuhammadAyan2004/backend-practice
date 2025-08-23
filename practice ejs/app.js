@@ -13,7 +13,7 @@ app.use(hostRouter)
 
 
 app.use(errorController.PageNotFound)
-
+app.use('/homeList/',errorController.PageNotFound)
 
 const port = 3001
 app.listen(port,()=>{

@@ -18,8 +18,10 @@
           <p class="text-gray-600">📍 <%= home.location %></p>
           <p class="text-yellow-500">⭐ <%= home.rating %></p>
           <p class="text-blue-600 font-semibold">💰 $<%= home.price %> / night</p>
-          <a class="bg-blue-500 p-2 text-white rounded-xl w-20" href="/homeList/<%= home.id %>">Details</a>
-          <button class="bg-green-500 p-2 text-white rounded-xl w-20">book</button>
+          <div class="flex gap-2">
+            <a class="bg-blue-500 py-3 px-4 text-white rounded-xl w-[15vh] h-[8vh]" href="/homeList/<%= home.id %>">Details</a>
+            <%- include('../partials/fav.ejs', {home:home}) %>
+          </div>
         </div>
       </div>
       <% }) %>

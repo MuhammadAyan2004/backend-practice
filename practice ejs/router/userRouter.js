@@ -1,17 +1,17 @@
 const express = require('express');
 const userRouter = express.Router()
 
-const homeController = require('../controllers/homes')
+const homeController = require('../controllers/storeController')
 
 userRouter.get('/',homeController.getIndex)
 
 userRouter.get('/home',homeController.gethomeAdd)
 
-userRouter.get('/homeAdded', homeController.getHomeAdded)
-
 userRouter.get('/homeList', homeController.getHomeList)
 
 userRouter.get('/favorite', homeController.getFavoriteList)
+
+userRouter.post('/favorite', homeController.postFavoriteList)
 
 userRouter.get('/bookings', homeController.getBooking)
 

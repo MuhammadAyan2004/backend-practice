@@ -37,6 +37,17 @@ exports.postFavoriteList = (req,res)=>{
         res.redirect('/favorite')
     })
 }
+exports.postremoveFav = (req,res)=>{
+    const homeID = req.params.homeId;
+    console.log("your current home",homeID);
+    Favorite.removeFav(homeID,(err)=>{
+        if(err){
+            console.log("couldn't remove your fav home");
+        }
+        res.redirect('/favorite')
+    })
+}
+
 exports.getBooking = (req,res)=>{
     res.render('store/bookings',{
             pageTitle:'Bookings',

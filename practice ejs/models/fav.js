@@ -1,7 +1,6 @@
 const path = require('path')
 const fs = require('fs')
 const dirname = require('../utils/pathUtil')
-const { json } = require('stream/consumers')
 const favFilePath = path.join(dirname, 'data', 'fav.json') 
 
 module.exports = class Favorite {
@@ -19,5 +18,11 @@ module.exports = class Favorite {
         fs.readFile(favFilePath, (err,data)=>{
             cb (!err ? JSON.parse(data) : []) 
         });
+    }
+    static removeFav(homeId,cb){
+        this.getFavorites(favs=>{
+            favs = favs.filter(fav => fav !== homeId)
+            fs.writeFile(favFilePath,JSON.stringify(favs), cb)
+        })
     }
 }

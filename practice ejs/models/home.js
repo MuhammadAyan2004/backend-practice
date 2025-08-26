@@ -1,6 +1,7 @@
 const path = require('path')
 const fs = require('fs')
 const dirname = require('../utils/pathUtil')
+const Favorite = require('./fav')
 const filePath = path.join(dirname, 'data', 'home.json') 
 module.exports = class home {
     constructor(houseName,price,location,rating,photoUrl){
@@ -11,9 +12,13 @@ module.exports = class home {
         this.photoUrl = photoUrl;
     }
     save () {
-        this.id = Math.random().toString()
         home.fetchAll((booking)=>{
-            booking.push(this)
+            if (this.id) {
+                booking = booking.map(home=> home.id === this.id ? this : home)
+            } else {
+                this.id = Math.random().toString()
+                booking.push(this)
+            }
             fs.writeFile(filePath, JSON.stringify(booking),err=>{
                 console.log('your err comes here', err);
             })
@@ -28,6 +33,14 @@ module.exports = class home {
         home.fetchAll(home=>{
             const homeFound = home.find(hom => hom.id === houseID)
             cb(homeFound)
+        })
+    }
+    static deletebyId (homeId,cb){
+        this.fetchAll(homes =>{
+            homes = homes.filter(home => home.id !== homeId );
+            fs.writeFile(filePath, JSON.stringify(homes),err =>{
+                Favorite.removeFav(homeId,cb)
+            })
         })
     }
 }

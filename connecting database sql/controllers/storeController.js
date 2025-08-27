@@ -20,35 +20,32 @@ exports.getHomeList = (req,res)=>{
         res.redirect('/')
     })
 }
+
 exports.getFavoriteList = (req,res)=>{
-    Favorite.getFavorites (fav=>{
-        home.fetchAll()(([registerHome])=>{
-            const favHomes = registerHome.filter(home => fav.includes(home.id))
-            res.render('store/favorite',{
-                booking:favHomes,
-                pageTitle:'Favorite List',
-                activePage:'favorite'
-            })
-        }).catch(err=>{
-            res.redirect('/')
-        })
+    Favorite.getFavorites().then(([fav])=>{
+        res.render('store/favorite',{booking:fav,pageTitle:'Favorite List',activePage:'favorite'})
+    }).catch(err =>{
+        res.redirect('/homeList')
     })
 }
+
 exports.postFavoriteList = (req,res)=>{
-    Favorite.addToFavorite(req.body.id,(err)=>{
-        if (err) {
-            console.log("err while making favorite: " , err);
-        }
+    const homeID = req.body.id
+    Favorite.addToFavorite(homeID)
+    .then(()=>{
         res.redirect('/favorite')
+    })
+    .catch(err=>{
+        res.redirect('/homeList')
     })
 }
 exports.postremoveFav = (req,res)=>{
     const homeID = req.params.homeId;
-    console.log("your current home",homeID);
-    Favorite.removeFav(homeID,(err)=>{
-        if(err){
-            console.log("couldn't remove your fav home");
-        }
+    Favorite.removeFav(homeID)
+    .then(()=>{
+        res.redirect('/favorite')
+    })
+    .catch(err =>{
         res.redirect('/favorite')
     })
 }

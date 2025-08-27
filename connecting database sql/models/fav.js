@@ -1,28 +1,12 @@
-const path = require('path')
-const fs = require('fs')
-const dirname = require('../utils/pathUtil')
-const favFilePath = path.join(dirname, 'data', 'fav.json') 
-
+const db = require('../utils/databaseUtil') 
 module.exports = class Favorite {
-    static addToFavorite (homeId, cb){
-        Favorite.getFavorites ((fav) => {
-            if(fav.includes(homeId)){
-                cb("home is already exixt");
-            }else{
-                fav.push(homeId)
-                fs.writeFile(favFilePath,JSON.stringify(fav), cb)
-            }
-        })
+    static addToFavorite (homeId){
+        return db.execute('insert into fav values (?)',[homeId])
     }
-    static getFavorites (cb){
-        fs.readFile(favFilePath, (err,data)=>{
-            cb (!err ? JSON.parse(data) : []) 
-        });
+    static getFavorites (){
+        return db.execute('select h.* from fav join homes h on fav.id = h.id ')
     }
-    static removeFav(homeId,cb){
-        this.getFavorites(favs=>{
-            favs = favs.filter(fav => fav !== homeId)
-            fs.writeFile(favFilePath,JSON.stringify(favs), cb)
-        })
+    static removeFav(homeId){
+        return db.execute('delete from fav where id=?',[homeId])
     }
 }

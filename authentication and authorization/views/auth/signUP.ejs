@@ -1,0 +1,93 @@
+<%- include('../partials/head.ejs') %>
+</head>
+<body>
+    <%- include('../partials/nav.ejs') %>
+    <main class="min-h-screen flex items-center justify-center bg-gray-100 p-6">
+        <div class="bg-white shadow-md rounded-xl px-6 py-2 w-full max-w-md text-center">
+            <h1 class="text-xl font-semibold text-center text-gray-800 mb-6">Create your Account</h1>
+            
+            <form action="/signIn" method="post" class="space-y-3">
+                <!-- First + Last Name -->
+                <div class="flex gap-2">
+                    <div class="w-full">
+                    <input type="text" name="FirstName" placeholder="First Name" 
+                            value="<%= oldInputs?.FirstName || '' %>" required
+                            class="w-full px-4 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+                    <% if(errors?.FirstName){ %>
+                        <p class="text-red-600 text-xs mt-1"><%= errors.FirstName.msg %></p>
+                    <% } %>
+                    </div>
+
+                    <div class="w-full">
+                    <input type="text" name="lastName" placeholder="Last Name" 
+                            value="<%= oldInputs?.lastName || '' %>" required
+                            class="w-full px-4 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+                    <% if(errors?.lastName){ %>
+                        <p class="text-red-600 text-xs mt-1"><%= errors.lastName.msg %></p>
+                    <% } %>
+                    </div>
+                </div>
+
+                <!-- Email -->
+                <div>
+                    <input type="email" name="Email" placeholder="Email Address" 
+                        value="<%= oldInputs?.Email || '' %>" required
+                        class="w-full px-4 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+                    <% if(errors?.Email){ %>
+                    <p class="text-red-600 text-xs mt-1"><%= errors.Email.msg %></p>
+                    <% } else if (errors[0]){%>
+                        <p class="text-red-600 text-xs mt-1 text-left px-4">This emial address is already taken someone</p>
+                    <% } %>
+                </div>
+
+                <!-- Password -->
+                <div>
+                    <input type="password" name="password" placeholder="Password"
+                        value="<%= oldInputs?.password || '' %>" required
+                        class="w-full px-4 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+                    <% if(errors?.password){ %>
+                    <p class="text-red-600 text-xs mt-1"><%= errors.password.msg %></p>
+                    <% } %>
+                </div>
+
+                <!-- Confirm Password -->
+                <div>
+                    <input type="password" name="confirmPassword" placeholder="Confirm Password" required
+                        class="w-full px-4 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+                    <% if(errors?.confirmPassword){ %>
+                    <p class="text-red-600 text-xs mt-1"><%= errors.confirmPassword.msg %></p>
+                    <% } %>
+                </div>
+
+                <!-- Account Type -->
+                <div>
+                    <select id="accountType" name="accountType" 
+                            class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-400 focus:outline-none">
+                    <option value="">-- Select Account Type --</option>
+                    <option value="host" <%= oldInputs?.accountType === 'host' ? 'selected' : '' %>>Host</option>
+                    <option value="user" <%= oldInputs?.accountType === 'user' ? 'selected' : '' %>>User</option>
+                    </select>
+                    <% if(errors?.accountType){ %>
+                    <p class="text-red-600 text-xs mt-1"><%= errors.accountType.msg %></p>
+                    <% } %>
+                </div>
+
+                <!-- Checkbox -->
+                <label class="flex items-center gap-2 text-sm text-gray-600">
+                    <input type="checkbox" name="authenticate" value="true" required
+                        class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                    I agree to the <a href="#" class="text-blue-600 hover:underline">Terms & Conditions</a>
+                </label>
+                <!-- Button -->
+                <button type="submit"
+                        class="w-full bg-blue-600 text-white text-sm font-medium py-2 rounded-lg hover:bg-blue-700 transition">
+                    Sign Up
+                </button>
+            </form>
+
+            <div class="text-sm w-full py-2 my-[10px]">Already have an account? <a href="/login" class="text-blue-500 hover:underline">Log in</a></div>
+        </div>
+    </main>
+
+</body>
+</html>

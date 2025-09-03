@@ -2,19 +2,33 @@ const fav = require("../models/fav")
 const home = require("../models/home")
 
 exports.getIndex = (req, res) => {
-    res.render('store/index', {pageTitle: 'Hotel pk', activePage: 'home',isLoggedIn: req.session.isLoggedIn })
+    res.render('store/index', {
+        pageTitle: 'Hotel pk', 
+        activePage: 'home',
+        isLoggedIn: req.session.isLoggedIn,
+        state:req.session.accType||{}
+    })
 }
 
 exports.gethomeAdd = (req,res)=>{
-    res.render('store/index',{pageTitle:'Hotel pk',activePage:'home',isLoggedIn: req.session.isLoggedIn})
+    res.render('store/index',{
+        pageTitle:'Hotel pk',
+        activePage:'home',
+        isLoggedIn: req.session.isLoggedIn,
+        state:req.session.accType||{}
+    })
 }
 exports.getHomeList = (req,res)=>{
+    if(req.session.accType !== 'user'){
+        return res.status(403).send("🚫 Access denied. Only users can view this page.")
+    }
     home.find().then(registerHome=>{
         res.render('store/homeList',{
             booking:registerHome,
             pageTitle:'Home List',
             activePage:'homeList',
-            isLoggedIn: req.session.isLoggedIn
+            isLoggedIn: req.session.isLoggedIn,
+            state:'user'
         })
     })
     .catch(err=>{
@@ -22,6 +36,9 @@ exports.getHomeList = (req,res)=>{
     })
 }
 exports.getHomeDetail = (req,res)=>{
+    if(req.session.accType !== 'user'){
+        return res.status(403).send("🚫 Access denied. Only users can view this page.")
+    }
     const homeId = req.params.homeId;
     home.findById(homeId)
     .then(home=>{
@@ -33,7 +50,8 @@ exports.getHomeDetail = (req,res)=>{
                 pageTitle: 'Home Detail', 
                 activePage: 'homeList',
                 home,
-                isLoggedIn: req.session.isLoggedIn
+                isLoggedIn: req.session.isLoggedIn,
+                state:'user'
             })
         }
     })
@@ -42,6 +60,9 @@ exports.getHomeDetail = (req,res)=>{
     })
 }
 exports.getFavoriteList = (req,res)=>{
+    if(req.session.accType !== 'user'){
+        return res.status(403).send("🚫 Access denied. Only users can view this page.")
+    }
     fav.find().populate('_id')
         .then(fav=>{
             res.render('store/favorite',
@@ -49,7 +70,8 @@ exports.getFavoriteList = (req,res)=>{
                     booking:fav,
                     pageTitle:'Favorite List',
                     activePage:'favorite',
-                    isLoggedIn: req.session.isLoggedIn
+                    isLoggedIn: req.session.isLoggedIn,
+                    state:'user'
                 })
         }).catch(err =>{
             console.log(err);
@@ -58,6 +80,9 @@ exports.getFavoriteList = (req,res)=>{
 }
 
 exports.postFavoriteList = (req,res)=>{
+    if(req.session.accType !== 'user'){
+        return res.status(403).send("🚫 Access denied. Only users can view this page.")
+    }
     const homeID = req.body.id
     fav.findById(homeID)
     .then(existingHome => {
@@ -76,6 +101,9 @@ exports.postFavoriteList = (req,res)=>{
     });
 }
 exports.postremoveFav = (req,res)=>{
+    if(req.session.accType !== 'user'){
+        return res.status(403).send("🚫 Access denied. Only users can view this page.")
+    }
     const homeID = req.params.homeId;
     fav.findByIdAndDelete(homeID)
     .then(()=>{
@@ -88,10 +116,14 @@ exports.postremoveFav = (req,res)=>{
 }
 
 exports.getBooking = (req,res)=>{
+    if(req.session.accType !== 'user'){
+        return res.status(403).send("🚫 Access denied. Only users can view this page.")
+    }
     res.render('store/bookings',{
             pageTitle:'Bookings',
             activePage:'booking',
-            isLoggedIn: req.session.isLoggedIn
+            isLoggedIn: req.session.isLoggedIn,
+            state:'user'
         })
 }
 

@@ -6,36 +6,54 @@ exports.getLogin = (req, res) => {
     res.render('auth/login', {
         pageTitle: 'login', 
         activePage: 'login',
-        isLoggedIn: false
+        isLoggedIn: req.session.isLoggedIn || false,
+        err:{},
+        state:req.session.accType || {}
     })
 }
 exports.postLogin = (req, res) => {
     const {Email,Password} =req.body
-    // signModel.find({},"email password accType")
-        // .then((users)=>{
-        //     users.forEach(user=>{
-        //         if(user.email === Email && user.password === Password){
-        //             console.log(Email,Password);
-        //             req.session.isLoggedIn = true
-        //             return res.redirect('/')
-        //         }else {
-        //             return res.render('auth/login',{
-        //                 pageTitle:'login',
-        //                 activePage:'login',
-        //                 isLoggedIn: false
-        //             })
-        //         }
-        //     })
-        // })
-        // .catch(err=>{
-        //     console.log(err);
-        // })
+    signModel.findOne({email:Email},"email password accType")
+        .then(user=>{
+            if(!user || user.password !== Password){
+                return res.render('auth/login',{
+                    pageTitle:'login',
+                    activePage:'login',
+                    isLoggedIn: false,
+                    err:{generalError: 'Invalid email and password please try again.'}
+                })
+            }
+            // if(user.password !== Password){
+            //     return res.render('auth/login',{
+            //         pageTitle:'login',
+            //         activePage:'login',
+            //         isLoggedIn: false,
+            //         err:{passerr:'password is not matched try again with different email.'}
+            //     })
+            // }
 
-    res.redirect('/')
+            if(user.accType === 'host'){
+                req.session.isLoggedIn = true;
+                req.session.accType = 'host'
+                res.redirect('/')
+            }else {
+                req.session.isLoggedIn = true;
+                req.session.accType = 'user'
+                res.redirect('/')
+            }
+        })
+        .catch(err=>{   
+            console.log(err);
+            return res.render('auth/login',{
+                pageTitle:'login',
+                activePage:'login',
+                isLoggedIn: false,
+                err:{generalerr:'something went wrong.'}
+            })
+        })
 }
 
 exports.postLogout = (req, res) => {
-    // res.cookie('isLoggedIn' , false)
     req.session.destroy(()=>{
         res.redirect('/login')
     })

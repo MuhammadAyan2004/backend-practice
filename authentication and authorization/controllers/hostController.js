@@ -1,57 +1,54 @@
 const home = require('../models/home')
-
-function checkHost(req){
-    return req.session.isLoggedIn && req.session.accType === 'host'
-}
+const signModel = require('../models/signModel')
 
 exports.getAddHome = (req, res) => {
-    if(!checkHost(req)){
-        return res.status(403).send("🚫 Access denied. Only hosts can add homes.")
-    }
     res.render('host/Addhome', {
         pageTitle: 'Add Home', 
         activePage: 'AddHome',
         editing: false,
         isLoggedIn: req.session.isLoggedIn,
-        state:'host'
+        user: req.session.user
     })
 }
 
-exports.getHomeAdded = (req, res) => {
-    if(!checkHost(req)){
-        return res.status(403).send("🚫 Access denied. Only hosts can add homes.")
-    }
-    home.find().then(registerHome => {
-        console.log(registerHome);
-        res.render('host/homeAdded', {
-            booking: registerHome,
-            pageTitle: 'book homes',
-            activePage: 'homeAdded',
-            isLoggedIn: req.session.isLoggedIn,
-            state:'host'
-        })
-    }).catch(err=>{
-        res.redirect('/')
-    })
-}
-exports.postHome = (req, res) => {
-    if(!checkHost(req)){
-        return res.status(403).send("🚫 Access denied. Only hosts can add homes.")
-    }
+exports.postHome = async (req, res) => {
+    const userId = req.session.user._id;
     const { userName, location, price, rating, pic, description } = req.body
-    const registerHome = new home({houseName:userName, price, location, rating, photoUrl:pic, description})
+    const registerHome = new home({
+        houseName:userName, 
+        price, 
+        location, 
+        rating, 
+        photoUrl:pic, 
+        description,
+        hostHomes:userId
+    })
     registerHome.save()
     res.render('host/homeRegister', {
         pageTitle: 'Registration Successful',
         activePage: 'AddHome',
         isLoggedIn: req.session.isLoggedIn,
-        state:'host'
+        user: req.session.user
     })
 }
+
+exports.getHomeAdded = async (req, res) => {
+    const userId = req.session.user._id;
+
+    home.find({hostHomes:userId}).then(registerHome => {
+        res.render('host/homeAdded', {
+            booking: registerHome,
+            pageTitle: 'book homes',
+            activePage: 'homeAdded',
+            isLoggedIn: req.session.isLoggedIn,
+            user: req.session.user
+        })
+    }).catch(err=>{
+        res.redirect('/')
+    })
+}
+
 exports.getEditHome = (req, res) => {
-    if(!checkHost(req)){
-        return res.status(403).send("🚫 Access denied. Only hosts can add homes.")
-    }
     const homeId = req.params.homeId;
     const editing = req.query.editing === 'true';
 
@@ -65,17 +62,15 @@ exports.getEditHome = (req, res) => {
                 editing: editing,
                 hom:hom,
                 isLoggedIn: req.session.isLoggedIn,
-                state:'host'
+                user: req.session.user
             })
         }
     })
 }
 exports.postEditHome = (req, res) => {
-    if(!checkHost(req)){
-        return res.status(403).send("🚫 Access denied. Only hosts can add homes.")
-    }
+    const userId = req.session.user._id;
     const {id,houseName, location, price, rating, photoUrl, description } = req.body
-    home.findByIdAndUpdate (id,{houseName,price,location,rating,photoUrl,description},{new:true})
+    home.findByIdAndUpdate (id,{houseName,price,location,rating,photoUrl,description,hostHomes:userId},{new:true})
     .then((updatedHome)=>{
         if(!updatedHome){
             console.log('home not found');
@@ -90,9 +85,6 @@ exports.postEditHome = (req, res) => {
 }
 
 exports.postDeleteHome = (req, res) => {
-    if(!checkHost(req)){
-        return res.status(403).send("🚫 Access denied. Only hosts can add homes.")
-    }
     const homeId = req.params.homeId;
     home.findByIdAndDelete(homeId)
         .then(() => {

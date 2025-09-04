@@ -1,6 +1,6 @@
 const { check, validationResult } = require("express-validator");
 const signModel = require("../models/signModel");
-// const signModel = require("../models/signUp") 
+const bcrypt = require("bcrypt");
 
 exports.getLogin = (req, res) => {
     res.render('auth/login', {
@@ -8,49 +8,39 @@ exports.getLogin = (req, res) => {
         activePage: 'login',
         isLoggedIn: req.session.isLoggedIn || false,
         err:{},
-        state:req.session.accType || {}
+        user: {}
     })
 }
-exports.postLogin = (req, res) => {
+exports.postLogin = async (req, res) => {
     const {Email,Password} =req.body
-    signModel.findOne({email:Email},"email password accType")
-        .then(user=>{
-            if(!user || user.password !== Password){
-                return res.render('auth/login',{
-                    pageTitle:'login',
-                    activePage:'login',
-                    isLoggedIn: false,
-                    err:{generalError: 'Invalid email and password please try again.'}
-                })
-            }
-            // if(user.password !== Password){
-            //     return res.render('auth/login',{
-            //         pageTitle:'login',
-            //         activePage:'login',
-            //         isLoggedIn: false,
-            //         err:{passerr:'password is not matched try again with different email.'}
-            //     })
-            // }
+    console.log(Email,Password);
+    const user = await signModel.findOne({email:Email})
+    console.log(user);
+    if(!user){
+        return res.status(403).render('auth/login',{
+            pageTitle: 'login', 
+            activePage: 'login',
+            isLoggedIn: false,
+            err:["invalid email and password please try again"],
+            user: {}
+        })
+    }
+    const isMatch = await bcrypt.compare(Password,user.password);
+    if(!isMatch){
+        return res.status(403).render('auth/login',{
+            pageTitle: 'login', 
+            activePage: 'login',
+            isLoggedIn: false,
+            err:["invalid email and password please try again"],
+            user: {}
+        })
+    }
 
-            if(user.accType === 'host'){
-                req.session.isLoggedIn = true;
-                req.session.accType = 'host'
-                res.redirect('/')
-            }else {
-                req.session.isLoggedIn = true;
-                req.session.accType = 'user'
-                res.redirect('/')
-            }
-        })
-        .catch(err=>{   
-            console.log(err);
-            return res.render('auth/login',{
-                pageTitle:'login',
-                activePage:'login',
-                isLoggedIn: false,
-                err:{generalerr:'something went wrong.'}
-            })
-        })
+
+    req.session.isLoggedIn = true
+    req.session.user = user
+    await req.session.save()
+    res.redirect('/')
 }
 
 exports.postLogout = (req, res) => {
@@ -65,7 +55,8 @@ exports.getSignIn = (req,res) =>{
         activePage:'sign',
         isLoggedIn:false,
         errors:[],
-        oldInputs:{FirstName:'',lastName:'',Email:'',password:'',confirmPassword:'',accountType:'',authenticate:''}
+        oldInputs:{FirstName:'',lastName:'',Email:'',password:'',confirmPassword:'',accountType:'',authenticate:''},
+        user: {}
     })
 }
 exports.postSignIn =[ 
@@ -133,11 +124,22 @@ exports.postSignIn =[
                 activePage: 'sign',
                 isLoggedIn: false,
                 errors: error.mapped(),
-                oldInputs: req.body
+                oldInputs: req.body,
+                user: {}
             })
         }
-        const saveSignUp = new signModel({firstName:FirstName,lastName:lastName,email:Email,password:password,accType:accountType})
-        saveSignUp.save()
+
+        bcrypt.hash(password,12)
+        .then(hashedPassword =>{
+            const User = new signModel({
+                firstName:FirstName,
+                lastName:lastName,
+                email:Email,
+                password:hashedPassword,
+                accType:accountType
+            })
+            return User.save()
+        })
         .then(()=>{
             res.redirect('/login')
         })
@@ -147,7 +149,8 @@ exports.postSignIn =[
                 activePage: 'sign',
                 isLoggedIn: false,
                 errors: [err.message],
-                oldInputs: req.body
+                oldInputs: req.body,
+                user: {}
             })
         })
 

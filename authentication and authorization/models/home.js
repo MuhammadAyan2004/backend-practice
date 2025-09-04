@@ -7,6 +7,7 @@ const homeScheme = new mongoose.Schema({
     rating: {type:Number,required:true},
     photoUrl: String,
     description: String,
+    hostHomes:{type:mongoose.Schema.Types.ObjectId}
 })
 
 

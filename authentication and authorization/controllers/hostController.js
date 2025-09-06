@@ -1,7 +1,9 @@
 const home = require('../models/home')
-const signModel = require('../models/signModel')
 
 exports.getAddHome = (req, res) => {
+    if(req.session.user.accType !== 'host'){
+        return res.status(403).send('🚫 Access denied. Only host can view this page.')
+    }
     res.render('host/Addhome', {
         pageTitle: 'Add Home', 
         activePage: 'AddHome',
@@ -12,6 +14,9 @@ exports.getAddHome = (req, res) => {
 }
 
 exports.postHome = async (req, res) => {
+    if(req.session.user.accType !== 'host'){
+        return res.status(403).send('🚫 Access denied. Only host can view this page.')
+    }
     const userId = req.session.user._id;
     const { userName, location, price, rating, pic, description } = req.body
     const registerHome = new home({
@@ -33,6 +38,9 @@ exports.postHome = async (req, res) => {
 }
 
 exports.getHomeAdded = async (req, res) => {
+    if(req.session.user.accType !== 'host'){
+        return res.status(403).send('🚫 Access denied. Only host can view this page.')
+    }
     const userId = req.session.user._id;
 
     home.find({hostHomes:userId}).then(registerHome => {
@@ -49,6 +57,9 @@ exports.getHomeAdded = async (req, res) => {
 }
 
 exports.getEditHome = (req, res) => {
+    if(req.session.user.accType !== 'host'){
+        return res.status(403).send('🚫 Access denied. Only host can view this page.')
+    }
     const homeId = req.params.homeId;
     const editing = req.query.editing === 'true';
 
@@ -68,6 +79,9 @@ exports.getEditHome = (req, res) => {
     })
 }
 exports.postEditHome = (req, res) => {
+    if(req.session.user.accType !== 'host'){
+        return res.status(403).send('🚫 Access denied. Only host can view this page.')
+    }
     const userId = req.session.user._id;
     const {id,houseName, location, price, rating, photoUrl, description } = req.body
     home.findByIdAndUpdate (id,{houseName,price,location,rating,photoUrl,description,hostHomes:userId},{new:true})
@@ -85,6 +99,9 @@ exports.postEditHome = (req, res) => {
 }
 
 exports.postDeleteHome = (req, res) => {
+    if(req.session.user.accType !== 'host'){
+        return res.status(403).send('🚫 Access denied. Only host can view this page.')
+    }
     const homeId = req.params.homeId;
     home.findByIdAndDelete(homeId)
         .then(() => {

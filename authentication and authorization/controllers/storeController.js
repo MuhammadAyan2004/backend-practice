@@ -20,6 +20,9 @@ exports.gethomeAdd = (req,res)=>{
     })
 }
 exports.getHomeList = (req,res)=>{
+    if(req.session.user.accType !== 'user'){
+        return res.status(403).send('🚫 Access denied. Only users can view this page.')
+    }
     home.find().then(registerHome=>{
         res.render('store/homeList',{
             booking:registerHome,
@@ -34,6 +37,9 @@ exports.getHomeList = (req,res)=>{
     })
 }
 exports.getHomeDetail = (req,res)=>{
+    if(req.session.user.accType !== 'user'){
+        return res.status(403).send('🚫 Access denied. Only users can view this page.')
+    }
     const homeId = req.params.homeId;
     home.findById(homeId)
     .then(home=>{
@@ -55,6 +61,9 @@ exports.getHomeDetail = (req,res)=>{
     })
 }
 exports.getFavoriteList = async (req,res)=>{
+    if(req.session.user.accType !== 'user'){
+        return res.status(403).send('🚫 Access denied. Only users can view this page.')
+    }
     const userId = req.session.user._id
     const user = await signModel.findById(userId).populate('favorites')
     console.log(user.favorites); 
@@ -68,6 +77,9 @@ exports.getFavoriteList = async (req,res)=>{
 }
 
 exports.postFavoriteList = async (req,res)=>{
+    if(req.session.user.accType !== 'user'){
+        return res.status(403).send('🚫 Access denied. Only users can view this page.')
+    }
     const homeID = req.body.id
     const userId = req.session.user._id
     const user = await signModel.findById(userId);
@@ -78,6 +90,9 @@ exports.postFavoriteList = async (req,res)=>{
     res.redirect('/favorite');
 }
 exports.postremoveFav = async (req,res)=>{
+    if(req.session.user.accType !== 'user'){
+        return res.status(403).send('🚫 Access denied. Only users can view this page.')
+    }
     const homeID = req.params.homeId;
     const userId = req.session.user._id;
     const user = await signModel.findById(userId)
@@ -89,6 +104,9 @@ exports.postremoveFav = async (req,res)=>{
 }
 
 exports.getBooking = (req,res)=>{
+    if(req.session.user.accType !== 'user'){
+        return res.status(403).send('🚫 Access denied. Only users can view this page.')
+    }
     res.render('store/bookings',{
             pageTitle:'Bookings',
             activePage:'booking',

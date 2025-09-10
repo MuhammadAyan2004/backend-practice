@@ -1,6 +1,7 @@
 const express = require('express')
 const session = require('express-session')
 const mongodb_Store = require('connect-mongodb-session')(session)
+const multer = require('multer')
 const db_Path = "mongodb://127.0.0.1:27017/airbnb"
 
 
@@ -20,6 +21,8 @@ const store = new mongodb_Store({
 })
 
 app.use(express.urlencoded())
+app.use(multer().single('pic'))
+
 app.use(session({
     secret:"it's secret",
     resave:false,

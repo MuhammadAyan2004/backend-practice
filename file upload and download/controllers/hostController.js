@@ -13,13 +13,15 @@ exports.getAddHome = (req, res) => {
 
 exports.postHome = async (req, res) => {
     const userId = req.session.user._id;
+    console.log(req.body);
     const { userName, location, price, rating, pic, description } = req.body
+    console.log(req.file);
     const registerHome = new home({
         houseName:userName, 
         price, 
         location, 
         rating, 
-        photoUrl:pic, 
+        img:pic, 
         description,
         hostHomes:userId
     })
@@ -69,8 +71,8 @@ exports.getEditHome = (req, res) => {
 }
 exports.postEditHome = (req, res) => {
     const userId = req.session.user._id;
-    const {id,houseName, location, price, rating, photoUrl, description } = req.body
-    home.findByIdAndUpdate (id,{houseName,price,location,rating,photoUrl,description,hostHomes:userId},{new:true})
+    const {id,houseName, location, price, rating, img, description } = req.body
+    home.findByIdAndUpdate (id,{houseName,price,location,rating,img,description,hostHomes:userId},{new:true})
     .then((updatedHome)=>{
         if(!updatedHome){
             console.log('home not found');

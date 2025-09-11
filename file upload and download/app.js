@@ -10,6 +10,8 @@ const { hostRouter } = require('./router/hostRouter')
 const { authRouter } = require('./router/authRouter')
 const errorController = require('./controllers/errorController')
 const { default: mongoose } = require('mongoose')
+const path = require('path')
+const rootDir = require('./utils/pathUtil')
 const app = express()
 
 app.set('view engine','ejs')
@@ -20,8 +22,41 @@ const store = new mongodb_Store({
     collection:'sessions',
 })
 
+const randomString = (length)=>{
+    const char = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    let result = ''
+    for (let i = 0; i < length; i++){
+        result += char.charAt(Math.floor(Math.random()* char.length))
+    }
+    return result;
+}
+
+const storage = multer.diskStorage({
+    destination: (req,file,cb)=>{
+        cb(null,'uploads/');
+    },
+    filename: (req,file,cb)=>{
+        cb(null, randomString(10) + '-' + file.originalname)
+    }
+})
+
+const filefilter = (req,file,cb)=>{
+    if(['image/jpeg','image/png','image/jpg'].includes(file.memtype)){
+        cb(null, true)
+    }else{
+        cb(null, false)
+    }
+}
+
+const options = {
+    storage,
+    filefilter 
+}
+
 app.use(express.urlencoded())
-app.use(multer().single('pic'))
+app.use(multer(options).single('pic'))
+app.use('/uploads', express.static(path.join(rootDir,'uploads')))
+app.use('/host/uploads', express.static(path.join(rootDir,'uploads')))
 
 app.use(session({
     secret:"it's secret",

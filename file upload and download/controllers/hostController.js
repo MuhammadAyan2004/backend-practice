@@ -14,8 +14,12 @@ exports.getAddHome = (req, res) => {
 exports.postHome = async (req, res) => {
     const userId = req.session.user._id;
     console.log(req.body);
-    const { userName, location, price, rating, pic, description } = req.body
+    const { userName, location, price, rating, description } = req.body
     console.log(req.file);
+    if(!req.file){
+        return res.status(422).send('image not found')
+    }
+    const pic = req.file.path
     const registerHome = new home({
         houseName:userName, 
         price, 
@@ -71,8 +75,12 @@ exports.getEditHome = (req, res) => {
 }
 exports.postEditHome = (req, res) => {
     const userId = req.session.user._id;
-    const {id,houseName, location, price, rating, img, description } = req.body
-    home.findByIdAndUpdate (id,{houseName,price,location,rating,img,description,hostHomes:userId},{new:true})
+    const {id,userName, location, price, rating, description } = req.body
+    let pic;
+    if(req.file){
+        pic = req.file.path
+    }
+    home.findByIdAndUpdate (id,{houseName:userName,price,location,rating,img:pic,description,hostHomes:userId},{new:true})
     .then((updatedHome)=>{
         if(!updatedHome){
             console.log('home not found');

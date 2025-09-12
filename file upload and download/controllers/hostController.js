@@ -12,30 +12,44 @@ exports.getAddHome = (req, res) => {
 }
 
 exports.postHome = async (req, res) => {
-    const userId = req.session.user._id;
-    console.log(req.body);
-    const { userName, location, price, rating, description } = req.body
-    console.log(req.file);
-    if(!req.file){
-        return res.status(422).send('image not found')
+    try{
+        const userId = req.session.user._id;
+        const { userName, location, price, rating, description } = req.body
+        
+        if(!req.files.pic || !req.files.pic[0]){
+            return res.status(422).send('image not found')
+        }
+        if(!req.files.rule || !req.files.rule[0]){
+            return res.status(422).send('pdf not found')
+        }
+
+        const registerHome = new home({
+            houseName:userName, 
+            price, 
+            location, 
+            rating, 
+            description,
+            img:{
+                data:req.files.pic[0].buffer,
+                contentType:req.files.pic[0].mimetype
+            }, 
+            rulepdf:{
+                data:req.files.rule[0].buffer,
+                contentType:req.files.rule[0].mimetype
+            },
+            hostHomes:userId
+        })
+        await registerHome.save()
+        res.render('host/homeRegister', {
+            pageTitle: 'Registration Successful',
+            activePage: 'AddHome',
+            isLoggedIn: req.session.isLoggedIn,
+            user: req.session.user
+        })
+    } catch (err){
+        console.error("❌ Error in postHome:", err);
+        res.status(500).send("Something went wrong");
     }
-    const pic = req.file.path
-    const registerHome = new home({
-        houseName:userName, 
-        price, 
-        location, 
-        rating, 
-        img:pic, 
-        description,
-        hostHomes:userId
-    })
-    registerHome.save()
-    res.render('host/homeRegister', {
-        pageTitle: 'Registration Successful',
-        activePage: 'AddHome',
-        isLoggedIn: req.session.isLoggedIn,
-        user: req.session.user
-    })
 }
 
 exports.getHomeAdded = async (req, res) => {
@@ -73,25 +87,42 @@ exports.getEditHome = (req, res) => {
         }
     })
 }
-exports.postEditHome = (req, res) => {
-    const userId = req.session.user._id;
-    const {id,userName, location, price, rating, description } = req.body
-    let pic;
-    if(req.file){
-        pic = req.file.path
-    }
-    home.findByIdAndUpdate (id,{houseName:userName,price,location,rating,img:pic,description,hostHomes:userId},{new:true})
-    .then((updatedHome)=>{
-        if(!updatedHome){
-            console.log('home not found');
-            return res.redirect('/host/homeAdded')
-        }else{
-            return res.redirect('/host/homeAdded')
+exports.postEditHome = async (req, res) => {
+    try{
+        const userId = req.session.user._id;
+        const {id,userName, location, price, rating, description } = req.body
+    
+    
+        let updatedData = {
+            houseName:userName,
+            price,
+            location,
+            rating,
+            description,
+            hostHomes:userId
         }
-    })
-    .catch(err=>{
+    
+        if(req.file && req.files.pic && req.files.pic[0]){
+            updatedData.img = {
+                data:req.files.pic[0].buffer,
+                contentType:req.files.pic[0].mimetype
+            }
+        }
+        if(req.file && req.files.rule && req.files.rule[0]){
+            updatedData.rulepdf = {
+                data:req.files.rule[0].buffer,
+                contentType:req.files.rule[0].mimetype
+            }
+        }
+    
+        const updatehome = await home.findByIdAndUpdate (id,updatedData,{new:true})
+        if(!updatehome){
+            console.log("home not found");
+        }
+        return res.redirect('/host/homeAdded')
+    } catch(err){
         console.log('there is some err:',err);
-    })
+    }
 }
 
 exports.postDeleteHome = (req, res) => {

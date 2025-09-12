@@ -1,4 +1,5 @@
 // const fav = require("../models/fav")
+
 const home = require("../models/home")
 const signModel = require("../models/signModel")
 
@@ -97,3 +98,25 @@ exports.getBooking = (req,res)=>{
         })
 }
 
+exports.getHomeRules = async (req,res,next)=>{
+    try{
+        const homeId = req.params.homeId
+        console.log("📂 Download route hit, homeId:", homeId); 
+
+        const house = await home.findById(homeId)
+
+        if(!house || !house.rulepdf ||!house.rulepdf.data){
+            return res.status(404).send("No rules PDF found for this home");
+        }
+        
+        res.set({
+            "content-Type": house.rulepdf.contentType,
+            "content-Disposition": "attachment; filename=Rules.pdf"
+        })
+        res.send(house.rulepdf.data)
+        console.log("✅ PDF sent successfully.");
+    } catch (err) {
+        console.error("❌ Error fetching rules:", err);
+        res.status(500).send("Could not download rules");
+    }
+}

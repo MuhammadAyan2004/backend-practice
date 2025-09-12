@@ -22,24 +22,7 @@ const store = new mongodb_Store({
     collection:'sessions',
 })
 
-const randomString = (length)=>{
-    const char = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
-    let result = ''
-    for (let i = 0; i < length; i++){
-        result += char.charAt(Math.floor(Math.random()* char.length))
-    }
-    return result;
-}
-
-const storage = multer.diskStorage({
-    destination: (req,file,cb)=>{
-        cb(null,'uploads/');
-    },
-    filename: (req,file,cb)=>{
-        cb(null, randomString(10) + '-' + file.originalname)
-    }
-})
-
+const storage = multer.memoryStorage()
 const filefilter = (req,file,cb)=>{
     if(['image/jpeg','image/png','image/jpg'].includes(file.memtype)){
         cb(null, true)
@@ -47,16 +30,14 @@ const filefilter = (req,file,cb)=>{
         cb(null, false)
     }
 }
-
-const options = {
-    storage,
-    filefilter 
-}
+const options = {storage,filefilter}
 
 app.use(express.urlencoded())
-app.use(multer(options).single('pic'))
-app.use('/uploads', express.static(path.join(rootDir,'uploads')))
-app.use('/host/uploads', express.static(path.join(rootDir,'uploads')))
+app.use(multer(options).fields([
+    {name:'pic', maxCount:1},
+    {name:'rule', maxCount:1}
+])
+);
 
 app.use(session({
     secret:"it's secret",

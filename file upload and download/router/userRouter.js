@@ -11,6 +11,7 @@ userRouter.post('/favorite', homeController.postFavoriteList)
 userRouter.post('/favorite/delete/:homeId',homeController.postremoveFav)
 userRouter.get('/bookings', homeController.getBooking)
 userRouter.get('/homeList/:homeId',homeController.getHomeDetail)
+userRouter.get('/rules/:homeId',homeController.getHomeRules)
 
 
 exports.userRouter = userRouter;

@@ -17,4 +17,15 @@ exports.deleteTodo = async (req,res)=>{
     await todoItem.findByIdAndDelete(id)
     res.json({ message: "Deleted successfully" });
 }
-
+exports.editTodo = async (req,res)=>{
+    const {id} = req.params
+    const {task} = req.body
+    const editTodo = await todoItem.findByIdAndUpdate(id,{task},{new:true})
+    res.json(editTodo);
+}
+exports.checkedTodo = async (req,res)=>{
+    const {id} = req.params
+    const {check} = req.body
+    const editTodo = await todoItem.findByIdAndUpdate(id,{completed:check},{new:true})
+    res.json(editTodo);
+}

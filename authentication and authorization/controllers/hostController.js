@@ -99,7 +99,7 @@ exports.postEditHome = (req, res) => {
 }
 
 exports.postDeleteHome = (req, res) => {
-    if(req.session.user.accType !== 'host'){
+    if( req.session.user.accType !== 'host'){
         return res.status(403).send('🚫 Access denied. Only host can view this page.')
     }
     const homeId = req.params.homeId;

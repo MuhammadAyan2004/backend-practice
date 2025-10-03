@@ -68,6 +68,7 @@ exports.postFavoriteList = (req,res)=>{
       res.redirect('/homeList');
     });
 }
+
 exports.postremoveFav = (req,res)=>{
     const homeID = req.params.homeId;
     fav.findByIdAndDelete(homeID)
